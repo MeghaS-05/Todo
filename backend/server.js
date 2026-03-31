@@ -1,29 +1,42 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import {connectDB} from "./config/db.js";
-import todoRoutes from "./routes/todo.route.js";
+import express from "express";
+import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
-const PORT = process.env.PORT || 5000;
 
+import { connectDB } from "./config/db.js";
+import todoRoutes from "./routes/todo.route.js";
+
+// Load env variables FIRST
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
-
-app.use("/api/todos",todoRoutes);
-
+// Resolve __dirname (ESM fix)
 const __dirname = path.resolve();
 
-if (process.env.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname, "/frontent/dist")));
-    app.get("*",(req,res)=>{
-        res.sendFile(path.resolve(__dirname,"frontent","dist","index.html"));
-    });
+// Connect DB
+connectDB();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// API Routes
+app.use("/api/todos", todoRoutes);
+
+// Production setup
+if (process.env.NODE_ENV === "production") {
+  // Serve static frontend
+  app.use(express.static(path.join(__dirname, "frontent", "dist")));
+
+  // Catch-all (Express 5 safe)
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, "frontent", "dist", "index.html"));
+  });
 }
 
-app.listen(PORT, ()=>{
-    console.log("Server started  at http://localhost:5000");
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
-

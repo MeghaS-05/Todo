@@ -16,7 +16,7 @@ router.get('/',async (req, res)=>{
 //Add a new todo
 router.post("/", async (req,res)=>{
     const todo = new Todo({
-        text: req.bosy.text
+        text: req.body.text
     })
     try{
         const newTodo = await todo.save();
@@ -27,20 +27,24 @@ router.post("/", async (req,res)=>{
 })
 
 //Update todo
-router.patch("/:id", async (req,res)=>{
-    try{
-        const todo = await Todo.findById(req.params.id);
-        if(!todo) return res.status(404).json({message:"Todo not found"});
+router.patch("/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findById(req.params.id);
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
 
-        if(req.body.text !== undefined){
-            todo.text = req.bosy.text;
-        }
-
-        const updatedTodo = await todo.save();
-        res.json(updatedTodo);
-    }catch(error){
-        res.status(400).json({message: err.message});
+    if (req.body.text !== undefined) {
+      todo.text = req.body.text;
     }
+
+    if (req.body.completed !== undefined) {
+      todo.completed = req.body.completed;
+    }
+
+    const updatedTodo = await todo.save();
+    res.json(updatedTodo);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
 //Delete a todo
@@ -50,7 +54,7 @@ router.delete("/:id", async (req,res)=>{
         res.json({message:"Todo Deleted"});
         
     }catch(error){
-            res.status(500).json({message: err.message});
+            res.status(500).json({message: error.message});
         }
 });
 
