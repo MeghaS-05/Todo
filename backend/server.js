@@ -19,7 +19,7 @@ const __dirname = path.resolve();
 connectDB();
 
 // Middleware
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
 
 // API Routes
